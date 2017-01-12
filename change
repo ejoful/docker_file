@@ -1,0 +1,22 @@
+
+# http://stackoverflow.com/questions/750172/change-the-author-and-committer-name-and-e-mail-of-multiple-commits-in-git
+# http://lmbj.net/blog/how-do-i-change-the-author-of-a-commit-in-git/
+# https://help.github.com/articles/changing-author-info/
+
+#!/bin/sh
+
+git filter-branch --env-filter '
+OLD_EMAIL="yaoyang@mobvoi.com"
+CORRECT_NAME="ejoful"
+CORRECT_EMAIL="ejoful@gmail.com"
+if [ "$GIT_COMMITTER_EMAIL" = "$OLD_EMAIL" ]
+then
+    export GIT_COMMITTER_NAME="$CORRECT_NAME"
+    export GIT_COMMITTER_EMAIL="$CORRECT_EMAIL"
+fi
+if [ "$GIT_AUTHOR_EMAIL" = "$OLD_EMAIL" ]
+then
+    export GIT_AUTHOR_NAME="$CORRECT_NAME"
+    export GIT_AUTHOR_EMAIL="$CORRECT_EMAIL"
+fi
+' --tag-name-filter cat -- --branches --tags
