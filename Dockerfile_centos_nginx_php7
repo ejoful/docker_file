@@ -1,14 +1,14 @@
-FROM centos
+FROM centos:centos7
 MAINTAINER sky
 
 # Install EPEL and Remi Repository
-RUN rpm -Uvh https://mirror.webtatic.com/yum/el7/epel-release.rpm
+RUN yum -y install epel-release
 RUN rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm
 
 # open epel Remi Repository
 RUN yum-config-manager --enable epel webtatic
 
-# updata 
+# update
 RUN  yum -y update
 
 # UTC Timezone & Networking
@@ -67,7 +67,7 @@ RUN sed -i \
     /etc/php.ini
 
 RUN sed -i \
-    -e 's/user = apach/user = nginx/g' \
+    -e 's/user = apache/user = nginx/g' \
     -e 's/group = apache/group = nginx/g' \
     -e 's/;listen.owner = nobody/listen.owner = nginx/g' \
     -e 's/;listen.group = nobody/listen.group = nginx/g' \
