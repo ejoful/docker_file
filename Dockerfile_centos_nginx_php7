@@ -1,0 +1,96 @@
+FROM centos
+MAINTAINER sky
+
+# Install EPEL and Remi Repository
+RUN rpm -Uvh https://mirror.webtatic.com/yum/el7/epel-release.rpm
+RUN rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm
+
+# open epel Remi Repository
+RUN yum-config-manager --enable epel webtatic
+
+# updata 
+RUN  yum -y update
+
+# UTC Timezone & Networking
+RUN ln -sf /usr/share/zoneinfo/UTC /etc/localtime \
+    && echo "NETWORKING=yes" > /etc/sysconfig/network
+
+# install nginx
+RUN yum -y install \
+    curl \
+    curl-devel \
+    icu \
+    nginx \
+    rsync \
+    unzip \
+    wget \
+    && rm -rf /var/cache/yum/* \
+    && yum clean all
+
+RUN sed -i -e 's~worker_processes auto;~worker_processes auto;\ndaemon off;~' /etc/nginx/nginx.conf
+
+# Install PHP71
+RUN yum -y install php71w php71w-fpm
+
+# Install common modules
+RUN yum -y install \
+    php71w-cli \
+    php71w-common \
+    php71w-devel \
+    php71w-gd \
+    php71w-imap \
+    php71w-intl \
+    php71w-mbstring \
+    php71w-mcrypt \
+    php71w-mysql \
+    php71w-opcache \
+    php71w-pdo \
+    php71w-pear \
+    php71w-pecl-apcu \
+    php71w-pecl-apcu-devel \
+    php71w-pecl-geoip \
+    php71w-pecl-imagick \
+    php71w-pecl-imagick-devel \
+    php71w-pecl-redis \
+    && rm -rf /var/cache/yum/* \
+    && yum clean all 
+
+RUN sed -i \
+    -e 's/max_execution_time = 30/max_execution_time = 600/g' \
+    -e 's/default_socket_timeout = 60/default_socket_timeout = 600/g' \
+    -e 's/max_input_time = 60/max_input_time = 600/g' \
+    -e 's/memory_limit = 128M/memory_limit = 1024M/g' \
+    -e 's/post_max_size = 8M/post_max_size = 2100M/g' \
+    -e 's/upload_max_filesize = 2M/upload_max_filesize = 2048M/g' \
+    -e 's#;curl.cainfo=#curl.cainfo = /etc/.cacert/cacert.pem#g' \
+    -e 's#;openssl.cafile=#openssl.cafile = /etc/.cacert/cacert.pem#g' \
+    /etc/php.ini
+
+RUN sed -i \
+    -e 's/user = apach/user = nginx/g' \
+    -e 's/group = apache/group = nginx/g' \
+    -e 's/;listen.owner = nobody/listen.owner = nginx/g' \
+    -e 's/;listen.group = nobody/listen.group = nginx/g' \
+    -e 's#listen = 127.0.0.1:9000#;listen = 127.0.0.1:9000\nlisten = /var/run/php-fpm/php-fpm.sock#g' \
+    /etc/php-fpm.d/www.conf
+
+# download cacert.pem to /etc/.cacert
+RUN wget -P /etc/.cacert https://curl.haxx.se/ca/cacert.pem
+
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer
+
+
+
+EXPOSE 80
+
+
+
+
+
+
+
+
+
+
+
