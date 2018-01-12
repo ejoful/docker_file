@@ -33,3 +33,9 @@ db3是后台容器的NAMES,d48b21a7e439是容器的进程ID  CONTAINER ID
 这个命令使用exit命令后，不会退出后台，一般使用这个命令，使用方法如下
 
 docker exec -it db3 /bin/sh 或者 docker exec -it d48b21a7e439 /bin/sh
+
+docker build -t docker.hub.com/php-base:7.1 .
+docker push docker.hub.com/php-base:7.1
+删除远程仓库中的images https://docs.docker.com/v1.6/reference/api/registry_api/#delete-a-repository
+curl -X DELETE docker.hub.com/v1/repositories/php-base/tags/7.1
+
