@@ -4,6 +4,8 @@ docker build -t website-com .
 
 docker run -p 8087:80 website-com /bin/bash -c 'php-fpm && sed -i -e "s/\\$port/80/g" /etc/nginx/conf.d/website_com.conf && nginx'
 
+docker run -p 8000:80 -v /home/website/logs:/home/servlets/logs  --privileged=true website /bin/bash -c "./start.sh 80"
+
 docker run -t -i website-com /bin/bash
 
 docker stop 139b7d7e6d98
